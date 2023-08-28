@@ -1,0 +1,34 @@
+{
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.1.3",
+    "express": "^4.18.2",
+    "logie": "^1.0.10",
+    "mongoose": "^7.2.2",
+    "morgan": "^1.10.0",
+    "nodemon": "^1.14.9",
+    "zod": "^3.21.4"
+  },
+  "name": "criss-server",
+  "description": "",
+  "version": "1.0.0",
+  "main": "src/app.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://%7B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%7D@github.com/Jockthan/CRISS-SERVER.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Jockthan/CRISS-SERVER/issues"
+  },
+  "homepage": "https://github.com/Jockthan/CRISS-SERVER#readme"
+}
