@@ -2,6 +2,8 @@ import  User  from "../models/user.model.js";
 import {addUserValidator, loginUserValidator, updateUser, deleteUserValidator, getUsers} from "../validators/user.validator.js";
 import bcrypt from "bcrypt";
 import {formatZodError} from "../utilities/errormessage.js";
+// import otpAuthenticator from "otp-authenticator"; 
+// Import OTP library
 // import userDetails from "../config/emailDetails.js";
 // import {google} from "googleapis";
 // import nodemailer from "nodemailer";
@@ -54,6 +56,7 @@ export const getSingleUser = async (req, res) => {
   // };
  
  
+  
   export const addUser = async (req, res) => {
     try {
       const result = addUserValidator.safeParse(req.body);
@@ -87,7 +90,7 @@ export const getSingleUser = async (req, res) => {
   
   export const loginUser = async (req, res) => {
     try {
-      const result = loginUserValidator.safeParse(req.body); // Assuming loginUserValidator is properly defined
+      const result = loginUserValidator.safeParse(req.body);
   
       if (!result.success) {
         return res.status(400).json(formatZodError(result.error.issues)).end();
@@ -96,15 +99,35 @@ export const getSingleUser = async (req, res) => {
       const user = await User.findOne({ batchId: req.body.batchId });
   
       if (!user) {
-        return res.status(401).json({ message: "Authentication failed" }).end();
+        return res.status(401).json({ message: "User Authentication failed" }).end();
       }
   
-      if (!bcrypt.compareSync(req.body.password, user.password)) {
-        return res.status(401).json({ message: "Authentication failed" }).end();
+      // Basic 2FA implementation
+      if (user.twoFactorEnabled) {
+        const otp = otpAuthenticator.generate(user.secretKey);
+  
+        if (!req.body.twoFactorCode && !req.body.reversePassword) {
+          return res.status(200).json({ message: "Provide 2FA code or reverse password" }).end();
+        }
+  
+        if (req.body.twoFactorCode) {
+          if (!otpAuthenticator.verify(user.secretKey, req.body.twoFactorCode)) {
+            return res.status(401).json({ message: "2FA Authentication failed" }).end();
+          }
+        } else if (req.body.reversePassword) {
+          if (!bcrypt.compareSync(req.body.reversePassword, user.password)) {
+            return res.status(401).json({ message: "Password Authentication failed" }).end();
+          }
+        }
+      } else {
+        if (!bcrypt.compareSync(req.body.password, user.password)) {
+          return res.status(401).json({ message: "Password Authentication failed" }).end();
+        }
       }
   
-      // Remove the password from the user object before sending it in the response
+      // Remove the password and secretKey from the user object before sending it in the response
       user.password = undefined;
+      user.secretKey = undefined;
   
       res.json(user).end();
     } catch (error) {
@@ -112,7 +135,7 @@ export const getSingleUser = async (req, res) => {
       res.status(500).json({ error: "An error occurred while logging in" }).end();
     }
   };
-  
+    
 
   // const OAuth2_Client = new OAuth2(userDet.clientId,userDet.clientSecret,'https://developers.google/playground')
   // OAuth2_Client.setCredentials({
@@ -188,4 +211,3 @@ export const getSingleUser = async (req, res) => {
   
     res.status(200).json({ message: "User Deleted Successfully" }).end();
   };
-  
