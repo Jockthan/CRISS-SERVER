@@ -7,6 +7,7 @@ const notificationSchema = new Schema({
         },
         date: {
             type: Date,
+            default: Date.now
         },
         notifyingOfficer:{
             type: String,

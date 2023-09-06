@@ -15,7 +15,7 @@ export const addUserValidator = z.object({
   // rank: z.string().min(1).max(30),
   station: z.string().min(1).max(30),
   batchId: z.string().min(1).max(30),
-  password: z.string().min(5).max(30),
+  // password: z.string().min(5).max(30),
   }).required({message: "Make sure you meet up all post requirements"});
 
 
